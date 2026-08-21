@@ -24,15 +24,43 @@ export function Canvas({ images, selectedId, selectImage, handleTransform }: Can
   const [scale, setScale] = useState(1);
 
   const updateScale = useCallback(() => {
-    if (!containerRef.current) return;
-    const available = containerRef.current.clientWidth;
-    setScale(Math.min(1, available / CANVAS_W));
+    const container = containerRef.current;
+    if (!container) return;
+
+    const availableWidth = container.clientWidth;
+    const containerTop = container.getBoundingClientRect().top + window.scrollY;
+    const main = container.closest("main");
+    const bottomPadding = main
+      ? Number.parseFloat(window.getComputedStyle(main).paddingBottom) || 0
+      : 0;
+    const visibleToolbar = window.matchMedia("(max-width: 639px)").matches
+      ? Array.from(document.querySelectorAll<HTMLElement>("[data-toolbar]"))
+          .find((toolbar) => toolbar.getBoundingClientRect().height > 0)
+      : null;
+    const mobileToolbar = visibleToolbar?.parentElement;
+    const mobileToolbarHeight = mobileToolbar?.getBoundingClientRect().height ?? 0;
+    const availableHeight = Math.max(
+      0,
+      window.innerHeight - containerTop - bottomPadding - mobileToolbarHeight
+    );
+
+    setScale(Math.min(
+      1,
+      availableWidth / CANVAS_W,
+      availableHeight / CANVAS_H
+    ));
   }, []);
 
   useEffect(() => {
     updateScale();
+    const observer = new ResizeObserver(updateScale);
+    if (containerRef.current) observer.observe(containerRef.current);
     window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
+    document.fonts.ready.then(updateScale);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateScale);
+    };
   }, [updateScale]);
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -40,8 +68,13 @@ export function Canvas({ images, selectedId, selectImage, handleTransform }: Can
   };
 
   return (
-    <div ref={containerRef} className="w-full min-w-0" style={{ maxWidth: CANVAS_W }}>
+    <div
+      ref={containerRef}
+      className="w-full min-w-0 flex justify-center"
+      style={{ maxWidth: CANVAS_W }}
+    >
       <div
+        className="shrink-0"
         style={{
           width: CANVAS_W * scale,
           height: CANVAS_H * scale,

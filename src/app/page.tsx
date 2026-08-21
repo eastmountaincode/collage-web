@@ -47,20 +47,20 @@ export default function Home() {
       <div className="flex items-center gap-4 sm:gap-6 mb-6">
         <div className="text-center">
           <h1
-            className="text-5xl sm:text-7xl tracking-wide mb-1"
+            className="text-4xl sm:text-6xl tracking-wide mb-1"
             style={{ fontFamily: "Pyxis, serif" }}
           >
             Body Language
           </h1>
-          <p className="text-sm tracking-[0.1em] text-[var(--accent)]">
+          {/* <p className="text-sm tracking-[0.1em] text-[var(--accent)]">
             A Collaborative Collage
-          </p>
+          </p> */}
         </div>
         <QRCode
           value="https://collage.andrew-boylan.com"
           size={80}
           level="M"
-          fgColor="#e0e0e0"
+          fgColor="var(--foreground)"
           bgColor="transparent"
         />
       </div>
@@ -87,7 +87,7 @@ export default function Home() {
       {displayMode && (
         <button
           onClick={() => setDisplayMode(false)}
-          className="fixed top-4 right-4 text-xs px-3 py-1.5 rounded bg-white/10 text-white/40 hover:text-white/80 hover:bg-white/20 transition-colors border border-white/10 cursor-pointer z-50"
+          className="fixed top-4 right-4 text-xs px-3 py-1.5 rounded bg-[var(--surface)] text-[var(--accent)] hover:text-[var(--foreground)] hover:bg-[var(--hover)] transition-colors border border-[var(--border)] cursor-pointer z-50"
         >
           Exit Display
         </button>

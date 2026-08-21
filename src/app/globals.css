@@ -9,12 +9,19 @@
 }
 
 :root {
-  --background: #111111;
-  --foreground: #e0e0e0;
-  --surface: #1a1a1a;
-  --border: #333333;
-  --accent: #888888;
-  --canvas-bg: #1e1e1e;
+  color-scheme: light;
+  --background: #f7f6f2;
+  --foreground: #1d1d1b;
+  --surface: #ffffff;
+  --border: #d2d0c9;
+  --accent: #6f6c65;
+  --canvas-bg: #eeece6;
+  --hover: #f0efeb;
+  --hover-border: #aaa69e;
+  --danger-hover: #fbefef;
+  --danger-border: #ca9a9a;
+  --danger-bg: #f7e4e4;
+  --danger-text: #8c2f2f;
 }
 
 @theme inline {
@@ -55,10 +62,10 @@ body {
 }
 
 #canvas img:hover {
-  outline: 1px solid rgba(255, 255, 255, 0.25);
+  outline: 1px solid rgba(29, 29, 27, 0.25);
 }
 
 #canvas img.selected {
-  outline: 2px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 0 16px rgba(255, 255, 255, 0.1);
+  outline: 2px solid rgba(29, 29, 27, 0.65);
+  box-shadow: 0 0 16px rgba(29, 29, 27, 0.12);
 }

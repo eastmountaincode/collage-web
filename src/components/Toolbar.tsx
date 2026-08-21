@@ -21,13 +21,13 @@ interface ToolbarProps {
   mobile?: boolean;
 }
 
-const btn = "flex items-center justify-center gap-1.5 px-3 py-2 text-[13px] border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] rounded cursor-pointer whitespace-nowrap text-center transition-colors hover:bg-[#2a2a2a] hover:border-[#555] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-[var(--surface)] disabled:hover:border-[var(--border)]";
+const btn = "flex items-center justify-center gap-1.5 px-3 py-2 text-[13px] border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] rounded cursor-pointer whitespace-nowrap text-center transition-colors hover:bg-[var(--hover)] hover:border-[var(--hover-border)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-[var(--surface)] disabled:hover:border-[var(--border)]";
 const btnFull = `${btn} w-full`;
-const btnDanger = `${btn} hover:bg-[#2a1515] hover:border-[#633]`;
+const btnDanger = `${btn} hover:bg-[var(--danger-hover)] hover:border-[var(--danger-border)]`;
 const btnDangerFull = `${btnDanger} w-full`;
-const btnYes = `${btn} bg-[#2a1a1a] border-[#633] text-[#f99]`;
+const btnYes = `${btn} bg-[var(--danger-bg)] border-[var(--danger-border)] text-[var(--danger-text)]`;
 const btnNo = `${btn}`;
-const labelCls = "text-[11px] uppercase tracking-[0.1em] text-[var(--accent)] mb-2";
+const labelCls = "text-[11px] tracking-[0.1em] text-[var(--accent)] mb-2";
 const ICON = 14;
 
 export function Toolbar({
@@ -201,11 +201,11 @@ export function Toolbar({
         {showAbout && (
           <div className="text-xs mt-3 leading-relaxed text-[var(--accent)]">
             <p className="mb-2">
-              <strong className="text-[var(--foreground)]">Body Language</strong> is a collaborative collage.
-              Add, move, and resize images — you&apos;ll see other users&apos; interactions in real time.
+              <strong className="text-[var(--foreground)]">Body Language</strong>{' '}is a collaborative collage.
+              Add, move, and resize images. You&apos;ll see other users&apos; interactions in real time.
             </p>
             <p className="mb-2">
-              <strong className="text-[var(--foreground)]">Adding:</strong> Tap &quot;Choose File&quot; to upload.
+              <strong className="text-[var(--foreground)]">Adding:</strong>{' '}Tap &quot;Choose File&quot; to upload.
             </p>
             <p className="mb-2">
               <strong className="text-[var(--foreground)]">Moving:</strong> Drag from the center. On mobile, use one finger.
@@ -217,7 +217,7 @@ export function Toolbar({
               <strong className="text-[var(--foreground)]">Rotating:</strong> Drag from corners (desktop) or two-finger twist (mobile).
             </p>
             <p>
-              <strong className="text-[var(--foreground)]">Tip:</strong> Search for &quot;transparent PNG&quot; images for best results.
+              <strong className="text-[var(--foreground)]">Tip:</strong>{' '}Search for &quot;transparent PNG&quot; images for best results.
             </p>
           </div>
         )}

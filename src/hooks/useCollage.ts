@@ -363,7 +363,7 @@ export function useCollage() {
     try {
       const html2canvas = (await import("html2canvas")).default;
       const result = await html2canvas(canvas, {
-        backgroundColor: "#1e1e1e",
+        backgroundColor: window.getComputedStyle(canvas).backgroundColor,
         scale: 1,
         width: CANVAS_W,
         height: CANVAS_H,
