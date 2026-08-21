@@ -52,7 +52,7 @@ export default function Home() {
           >
             Body Language
           </h1>
-          <p className="text-sm tracking-[0.2em] text-[var(--accent)]">
+          <p className="text-sm tracking-[0.1em] text-[var(--accent)]">
             A Collaborative Collage
           </p>
         </div>
