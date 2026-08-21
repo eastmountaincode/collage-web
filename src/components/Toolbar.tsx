@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import {
   ImagePlus, Trash2, ArrowUpToLine, ArrowDownToLine,
   Lock, Unlock, Camera, Monitor, Eraser, Users, Info,
@@ -19,6 +19,7 @@ interface ToolbarProps {
   onScreenshot: () => void;
   onDisplayMode?: () => void;
   mobile?: boolean;
+  desktopHeader?: ReactNode;
 }
 
 const btn = "flex items-center justify-center gap-1.5 px-3 py-2 text-[13px] border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] rounded cursor-pointer whitespace-nowrap text-center transition-colors hover:bg-[var(--hover)] hover:border-[var(--hover-border)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-[var(--surface)] disabled:hover:border-[var(--border)]";
@@ -43,6 +44,7 @@ export function Toolbar({
   onScreenshot,
   onDisplayMode,
   mobile,
+  desktopHeader,
 }: ToolbarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -118,6 +120,12 @@ export function Toolbar({
     <div data-toolbar className="bg-[var(--surface)] border border-[var(--border)] rounded p-4 w-[200px] shrink-0">
       {hiddenInput}
 
+      {desktopHeader && (
+        <div className="flex justify-center pb-3 mb-3 border-b border-[var(--border)]">
+          {desktopHeader}
+        </div>
+      )}
+
       <Section>
         <div className={labelCls}>Add Image</div>
         <button onClick={handleFileSelect} disabled={uploading} className={btnFull}>
@@ -126,7 +134,7 @@ export function Toolbar({
         </button>
       </Section>
 
-      <Section>
+      <Section divided>
         <div className={labelCls}>Selected Image</div>
         <div className="flex flex-col gap-2">
           <button onClick={onDelete} disabled={!selectedId} className={btnDangerFull}>
@@ -182,7 +190,7 @@ export function Toolbar({
         )}
       </Section>
 
-      <Section>
+      <Section divided>
         <div className={labelCls}>Status</div>
         <span className="flex items-center gap-1.5 text-sm text-[var(--accent)]">
           <Users size={14} />
@@ -226,9 +234,9 @@ export function Toolbar({
   );
 }
 
-function Section({ children }: { children: React.ReactNode }) {
+function Section({ children, divided = false }: { children: React.ReactNode; divided?: boolean }) {
   return (
-    <div className="pb-3 mb-3 border-b border-[var(--border)]">
+    <div className={`pb-2 mb-2 ${divided ? "border-b border-[var(--border)]" : ""}`}>
       {children}
     </div>
   );

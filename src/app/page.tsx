@@ -42,36 +42,44 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center px-4 py-6 sm:py-10">
-      {/* Header */}
-      <div className="flex items-center gap-4 sm:gap-6 mb-6">
-        <div className="text-center">
-          {/* <h1
-            className="text-4xl sm:text-6xl tracking-wide mb-1"
-            style={{ fontFamily: "Pyxis, serif" }}
-          >
-            Body Language
-          </h1> */}
-          {/* <p className="text-sm tracking-[0.1em] text-[var(--accent)]">
-            A Collaborative Collage
-          </p> */}
+    <main className="min-h-screen flex flex-col items-center px-4 py-6 md:px-6">
+      {!displayMode && (
+        <div className="md:hidden mb-6">
+          <QRCode
+            value="https://collage.andrew-boylan.com"
+            size={80}
+            level="M"
+            fgColor="var(--foreground)"
+            bgColor="transparent"
+          />
         </div>
-        <QRCode
-          value="https://collage.andrew-boylan.com"
-          size={80}
-          level="M"
-          fgColor="var(--foreground)"
-          bgColor="transparent"
-        />
-      </div>
+      )}
 
-      {/* Main content: single Canvas, with optional side panel on desktop */}
-      <div className="w-full flex flex-col sm:flex-row gap-4 items-center sm:items-start sm:justify-center">
-        {/* Desktop side panel (hidden on mobile or in display mode) */}
+      {/* Wide layouts use one consistent 24px rhythm from page to sidebar to canvas. */}
+      <div className={displayMode
+        ? "w-full grid grid-cols-1 gap-6 items-start"
+        : "w-full grid grid-cols-1 md:grid-cols-[200px_minmax(0,900px)] gap-6 items-start"
+      }>
         {!displayMode && (
-          <div className="hidden sm:block">
-            <Toolbar {...toolbarProps} />
-          </div>
+          <aside className="hidden md:block">
+            <Toolbar
+              {...toolbarProps}
+              desktopHeader={(
+                <a
+                  href="https://collage.andrew-boylan.com"
+                  aria-label="Open the collaborative collage"
+                >
+                  <QRCode
+                    value="https://collage.andrew-boylan.com"
+                    size={56}
+                    level="M"
+                    fgColor="var(--foreground)"
+                    bgColor="transparent"
+                  />
+                </a>
+              )}
+            />
+          </aside>
         )}
 
         {/* Single Canvas instance for all viewports */}
@@ -80,6 +88,7 @@ export default function Home() {
           selectedId={displayMode ? null : collage.selectedId}
           selectImage={displayMode ? () => {} : collage.selectImage}
           handleTransform={displayMode ? () => {} : collage.handleTransform}
+          alignDesktop={displayMode ? "center" : "start"}
         />
       </div>
 
@@ -95,13 +104,13 @@ export default function Home() {
 
       {/* Mobile floating toolbar */}
       {!displayMode && (
-        <div className="sm:hidden fixed bottom-0 left-0 right-0 z-[100] bg-[var(--surface)] border-t border-[var(--border)] p-2" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
+        <div data-mobile-toolbar className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-[var(--surface)] border-t border-[var(--border)] p-2" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
           <Toolbar {...toolbarProps} mobile />
         </div>
       )}
 
       {/* Bottom spacer on mobile for floating toolbar */}
-      <div className="h-28 sm:hidden" />
+      <div className="h-28 md:hidden" />
 
       {!collage.isConnected && <DisconnectModal />}
     </main>

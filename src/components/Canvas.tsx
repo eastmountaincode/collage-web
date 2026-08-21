@@ -15,9 +15,16 @@ interface CanvasProps {
     id: string, x: number, y: number, w: number, h: number,
     rotation: number, final?: boolean
   ) => void;
+  alignDesktop?: "start" | "center";
 }
 
-export function Canvas({ images, selectedId, selectImage, handleTransform }: CanvasProps) {
+export function Canvas({
+  images,
+  selectedId,
+  selectImage,
+  handleTransform,
+  alignDesktop = "center",
+}: CanvasProps) {
   useCanvasGestures({ selectImage, handleTransform });
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,12 +40,11 @@ export function Canvas({ images, selectedId, selectImage, handleTransform }: Can
     const bottomPadding = main
       ? Number.parseFloat(window.getComputedStyle(main).paddingBottom) || 0
       : 0;
-    const visibleToolbar = window.matchMedia("(max-width: 639px)").matches
-      ? Array.from(document.querySelectorAll<HTMLElement>("[data-toolbar]"))
-          .find((toolbar) => toolbar.getBoundingClientRect().height > 0)
-      : null;
-    const mobileToolbar = visibleToolbar?.parentElement;
-    const mobileToolbarHeight = mobileToolbar?.getBoundingClientRect().height ?? 0;
+    const mobileToolbar = document.querySelector<HTMLElement>("[data-mobile-toolbar]");
+    const mobileToolbarHeight = mobileToolbar
+      && window.getComputedStyle(mobileToolbar).display !== "none"
+      ? mobileToolbar.getBoundingClientRect().height
+      : 0;
     const availableHeight = Math.max(
       0,
       window.innerHeight - containerTop - bottomPadding - mobileToolbarHeight
@@ -70,7 +76,7 @@ export function Canvas({ images, selectedId, selectImage, handleTransform }: Can
   return (
     <div
       ref={containerRef}
-      className="w-full min-w-0 flex justify-center"
+      className={`w-full min-w-0 flex justify-center ${alignDesktop === "start" ? "md:justify-start" : ""}`}
       style={{ maxWidth: CANVAS_W }}
     >
       <div
