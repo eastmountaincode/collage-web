@@ -1,4 +1,17 @@
-import { CANVAS_W, CANVAS_H, EDGE_ZONE, CORNER_ZONE, type Zone } from "./canvas-types";
+import { CANVAS_W, CANVAS_H, EDGE_ZONE, CORNER_ZONE, MIN_SIZE, type Zone } from "./canvas-types";
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+interface PinchSnapshot {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  rot: number;
+}
 
 /**
  * Convert screen coordinates to canvas coordinates,
@@ -154,4 +167,40 @@ export function dist(a: { x: number; y: number }, b: { x: number; y: number }) {
 
 export function angle(a: { x: number; y: number }, b: { x: number; y: number }) {
   return Math.atan2(b.y - a.y, b.x - a.x) * (180 / Math.PI);
+}
+
+/**
+ * Apply a two-finger gesture around its moving midpoint.
+ * The image follows midpoint translation while scaling and rotating.
+ */
+export function getPinchTransform(
+  snapshot: PinchSnapshot,
+  startMidpoint: Point,
+  currentMidpoint: Point,
+  scale: number,
+  angleDelta: number
+) {
+  const w = Math.max(MIN_SIZE, snapshot.w * scale);
+  const h = Math.max(MIN_SIZE, snapshot.h * scale);
+  const rot = snapshot.rot + angleDelta;
+
+  const offsetX = (snapshot.x + snapshot.w / 2) - startMidpoint.x;
+  const offsetY = (snapshot.y + snapshot.h / 2) - startMidpoint.y;
+  const scaledOffsetX = offsetX * (w / snapshot.w);
+  const scaledOffsetY = offsetY * (h / snapshot.h);
+  const angleRad = (angleDelta * Math.PI) / 180;
+  const centerX = currentMidpoint.x
+    + scaledOffsetX * Math.cos(angleRad)
+    - scaledOffsetY * Math.sin(angleRad);
+  const centerY = currentMidpoint.y
+    + scaledOffsetX * Math.sin(angleRad)
+    + scaledOffsetY * Math.cos(angleRad);
+
+  return {
+    x: centerX - w / 2,
+    y: centerY - h / 2,
+    w,
+    h,
+    rot,
+  };
 }

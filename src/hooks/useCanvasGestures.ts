@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { MIN_SIZE, type DragState, type PinchState } from "@/lib/canvas-types";
 import {
   screenToCanvas, screenDeltaToCanvas,
-  getZone, cursorForZone, writeEl, dist, angle,
+  getZone, cursorForZone, writeEl, dist, angle, getPinchTransform,
 } from "@/lib/canvas-utils";
 
 interface GestureCallbacks {
@@ -92,6 +92,13 @@ export function useCanvasGestures(callbacks: GestureCallbacks) {
           const pts = Array.from(pinch.pointers.values());
           pinch.startDist = dist(pts[0], pts[1]);
           pinch.startAngle = angle(pts[0], pts[1]);
+          const midpoint = screenToCanvas(
+            (pts[0].x + pts[1].x) / 2,
+            (pts[0].y + pts[1].y) / 2,
+            getRect()
+          );
+          pinch.startMidX = midpoint.x;
+          pinch.startMidY = midpoint.y;
           pinch.snapX = pinch.x;
           pinch.snapY = pinch.y;
           pinch.snapW = pinch.w;
@@ -108,7 +115,7 @@ export function useCanvasGestures(callbacks: GestureCallbacks) {
         pinchRef.current = {
           imageId: id, el: img, pointers: p,
           x: s.x, y: s.y, w: s.w, h: s.h, rot: s.rot,
-          startDist: 0, startAngle: 0,
+          startDist: 0, startAngle: 0, startMidX: 0, startMidY: 0,
           snapX: s.x, snapY: s.y, snapW: s.w, snapH: s.h, snapRot: s.rot,
           moved: false, downTime: Date.now(),
         };
@@ -251,19 +258,25 @@ export function useCanvasGestures(callbacks: GestureCallbacks) {
       const pts = Array.from(p.pointers.values());
       const scale = p.startDist > 0 ? dist(pts[0], pts[1]) / p.startDist : 1;
       const angleDelta = angle(pts[0], pts[1]) - p.startAngle;
+      const midpoint = screenToCanvas(
+        (pts[0].x + pts[1].x) / 2,
+        (pts[0].y + pts[1].y) / 2,
+        rect
+      );
 
-      const nw = Math.max(MIN_SIZE, p.snapW * scale);
-      const nh = Math.max(MIN_SIZE, p.snapH * scale);
-      const nr = p.snapRot + angleDelta;
+      const transform = getPinchTransform(
+        { x: p.snapX, y: p.snapY, w: p.snapW, h: p.snapH, rot: p.snapRot },
+        { x: p.startMidX, y: p.startMidY },
+        midpoint,
+        scale,
+        angleDelta
+      );
 
-      const cx = p.snapX + p.snapW / 2;
-      const cy = p.snapY + p.snapH / 2;
-
-      p.x = cx - nw / 2;
-      p.y = cy - nh / 2;
-      p.w = nw;
-      p.h = nh;
-      p.rot = nr;
+      p.x = transform.x;
+      p.y = transform.y;
+      p.w = transform.w;
+      p.h = transform.h;
+      p.rot = transform.rot;
 
       writeEl(p.el, p.x, p.y, p.w, p.h, p.rot);
       cbRef.current.handleTransform(p.imageId, p.x, p.y, p.w, p.h, p.rot);

@@ -48,6 +48,8 @@ export interface PinchState {
   // Snapshot when 2nd finger arrives (for pinch reference)
   startDist: number;
   startAngle: number;
+  startMidX: number;
+  startMidY: number;
   snapX: number;
   snapY: number;
   snapW: number;
