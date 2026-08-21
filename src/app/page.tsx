@@ -46,12 +46,12 @@ export default function Home() {
       {/* Header */}
       <div className="flex items-center gap-4 sm:gap-6 mb-6">
         <div className="text-center">
-          <h1
+          {/* <h1
             className="text-4xl sm:text-6xl tracking-wide mb-1"
             style={{ fontFamily: "Pyxis, serif" }}
           >
             Body Language
-          </h1>
+          </h1> */}
           {/* <p className="text-sm tracking-[0.1em] text-[var(--accent)]">
             A Collaborative Collage
           </p> */}
