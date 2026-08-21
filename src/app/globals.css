@@ -9,8 +9,12 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #111111;
+  --foreground: #e0e0e0;
+  --surface: #1a1a1a;
+  --border: #333333;
+  --accent: #888888;
+  --canvas-bg: #1e1e1e;
 }
 
 @theme inline {
@@ -20,40 +24,41 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
+/* Canvas — must be global because gesture handlers manipulate these elements directly */
 #canvas {
   width: 900px;
   height: 1100px;
-  border: 3px solid black;
+  border: 2px solid var(--border);
   position: relative;
-  background-color: white;
+  background-color: var(--canvas-bg);
   touch-action: none;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
 #canvas img {
   position: absolute;
   touch-action: none;
-  cursor: grab;
   user-select: none;
   -webkit-user-select: none;
+  cursor: grab;
+  /* Override Tailwind's img reset which caps width and forces auto height */
+  max-width: none;
+  max-height: none;
 }
 
 #canvas img:hover {
-  outline: 1px solid rgba(0, 0, 0, 0.3);
+  outline: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 #canvas img.selected {
-  box-shadow: 0 0 0 2px #3b82f6;
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.1);
 }

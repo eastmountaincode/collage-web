@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CollageImage, ServerMessage } from "@/lib/types";
+import { CANVAS_W, CANVAS_H } from "@/lib/canvas-types";
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:3001/ws";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -20,6 +21,23 @@ export function useCollage() {
     setRenderTick((n) => n + 1);
   }, []);
 
+  // Update an image element's position/size/rotation directly in the DOM.
+  // Avoids React re-render which would restart GIF animations.
+  const updateImageEl = useCallback(
+    (id: string, x: number, y: number, w?: number, h?: number, rot?: number) => {
+      const el = document.getElementById(`img-${id}`) as HTMLElement | null;
+      if (!el) return;
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+      el.setAttribute("data-x", String(x));
+      el.setAttribute("data-y", String(y));
+      if (w !== undefined) el.style.width = `${w}px`;
+      if (h !== undefined) el.style.height = `${h}px`;
+      if (rot !== undefined) el.style.transform = `rotate(${rot}deg)`;
+    },
+    []
+  );
+
   // --- WebSocket message handling ---
   const handleServerMessage = useCallback(
     (msg: ServerMessage) => {
@@ -29,6 +47,8 @@ export function useCollage() {
         case "init": {
           map.clear();
           for (const img of msg.images) {
+            // Ensure rotation exists for backward compat
+            if (img.rotation === undefined) img.rotation = 0;
             map.set(img.id, img);
           }
           tick();
@@ -43,15 +63,9 @@ export function useCollage() {
           if (img) {
             img.x = msg.x;
             img.y = msg.y;
-            // Update DOM directly for smooth remote updates
-            const el = document.getElementById(`img-${msg.id}`) as HTMLElement | null;
-            if (el) {
-              el.style.left = `${msg.x}px`;
-              el.style.top = `${msg.y}px`;
-              el.setAttribute("data-x", String(msg.x));
-              el.setAttribute("data-y", String(msg.y));
-            }
           }
+          // Direct DOM update — avoids React re-render which restarts GIF animations
+          updateImageEl(msg.id, msg.x, msg.y);
           break;
         }
         case "resize": {
@@ -61,26 +75,31 @@ export function useCollage() {
             img.y = msg.y;
             img.width = msg.width;
             img.height = msg.height;
-            const el = document.getElementById(`img-${msg.id}`) as HTMLElement | null;
-            if (el) {
-              el.style.left = `${msg.x}px`;
-              el.style.top = `${msg.y}px`;
-              el.style.width = `${msg.width}px`;
-              el.style.height = `${msg.height}px`;
-              el.setAttribute("data-x", String(msg.x));
-              el.setAttribute("data-y", String(msg.y));
-            }
           }
+          updateImageEl(msg.id, msg.x, msg.y, msg.width, msg.height);
+          break;
+        }
+        case "transform": {
+          const img = map.get(msg.id);
+          if (img) {
+            img.x = msg.x;
+            img.y = msg.y;
+            img.width = msg.width;
+            img.height = msg.height;
+            img.rotation = msg.rotation;
+          }
+          updateImageEl(msg.id, msg.x, msg.y, msg.width, msg.height, msg.rotation);
           break;
         }
         case "uploaded": {
           map.set(msg.id, {
             id: msg.id,
-            x: 0,
-            y: 0,
+            x: msg.x ?? 0,
+            y: msg.y ?? 0,
             width: msg.width,
             height: msg.height,
             zIndex: msg.zIndex,
+            rotation: 0,
           });
           tick();
           break;
@@ -124,9 +143,15 @@ export function useCollage() {
           tick();
           break;
         }
+        case "lock": {
+          const img = map.get(msg.id);
+          if (img) img.locked = msg.locked;
+          tick();
+          break;
+        }
       }
     },
-    [tick]
+    [tick, updateImageEl]
   );
 
   // --- WebSocket connection ---
@@ -223,15 +248,21 @@ export function useCollage() {
       const { naturalWidth, naturalHeight } = img;
       URL.revokeObjectURL(objectUrl);
 
+      // Scale to 300px on longest side
+      const INITIAL_SIZE = 300;
       let width: number;
       let height: number;
       if (naturalWidth >= naturalHeight) {
-        width = 150;
-        height = Math.round((150 / naturalWidth) * naturalHeight);
+        width = INITIAL_SIZE;
+        height = Math.round((INITIAL_SIZE / naturalWidth) * naturalHeight);
       } else {
-        height = 150;
-        width = Math.round((150 / naturalHeight) * naturalWidth);
+        height = INITIAL_SIZE;
+        width = Math.round((INITIAL_SIZE / naturalHeight) * naturalWidth);
       }
+
+      // Center on canvas
+      const x = Math.round((CANVAS_W - width) / 2);
+      const y = Math.round((CANVAS_H - height) / 2);
 
       // Calculate zIndex
       const existingImages = Array.from(imagesRef.current.values());
@@ -245,16 +276,17 @@ export function useCollage() {
       // Add to local state
       imagesRef.current.set(fullId, {
         id: fullId,
-        x: 0,
-        y: 0,
+        x,
+        y,
         width,
         height,
         zIndex,
+        rotation: 0,
       });
       tick();
 
       // Notify server
-      sendWs({ type: "uploaded", id: fullId, width, height, zIndex });
+      sendWs({ type: "uploaded", id: fullId, x, y, width, height, zIndex });
     },
     [tick, sendWs]
   );
@@ -287,14 +319,30 @@ export function useCollage() {
     handleServerMessage({ type: "toBack", id: selectedId });
   }, [selectedId, sendWs, handleServerMessage]);
 
-  const handleMove = useCallback(
-    (id: string, x: number, y: number, final?: boolean) => {
+  const toggleLock = useCallback(() => {
+    if (!selectedId) return;
+    const img = imagesRef.current.get(selectedId);
+    if (!img) return;
+    const locked = !img.locked;
+    img.locked = locked;
+    sendWs({ type: "lock", id: selectedId, locked });
+    tick();
+  }, [selectedId, sendWs, tick]);
+
+  const handleTransform = useCallback(
+    (id: string, x: number, y: number, width: number, height: number, rotation: number, final?: boolean) => {
       const img = imagesRef.current.get(id);
+      if (!img) return;
+      // Don't allow transforms on locked images
+      if (img.locked) return;
       if (img) {
         img.x = x;
         img.y = y;
+        img.width = width;
+        img.height = height;
+        img.rotation = rotation;
       }
-      const data = { type: "move", id, x, y };
+      const data = { type: "transform", id, x, y, width, height, rotation };
       if (final) {
         sendWs(data);
       } else {
@@ -304,24 +352,33 @@ export function useCollage() {
     [sendWs, sendThrottled]
   );
 
-  const handleResize = useCallback(
-    (id: string, x: number, y: number, width: number, height: number, final?: boolean) => {
-      const img = imagesRef.current.get(id);
-      if (img) {
-        img.x = x;
-        img.y = y;
-        img.width = width;
-        img.height = height;
-      }
-      const data = { type: "resize", id, x, y, width, height };
-      if (final) {
-        sendWs(data);
-      } else {
-        sendThrottled(data);
-      }
-    },
-    [sendWs, sendThrottled]
-  );
+  const takeScreenshot = useCallback(async () => {
+    const canvas = document.getElementById("canvas") as HTMLElement | null;
+    if (!canvas) return;
+
+    // Temporarily reset transform so html2canvas captures at full size
+    const origTransform = canvas.style.transform;
+    canvas.style.transform = "none";
+
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const result = await html2canvas(canvas, {
+        backgroundColor: "#1e1e1e",
+        scale: 1,
+        width: CANVAS_W,
+        height: CANVAS_H,
+        useCORS: true,
+        allowTaint: false,
+      });
+      const url = result.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "collage.png";
+      a.click();
+    } finally {
+      canvas.style.transform = origTransform;
+    }
+  }, []);
 
   // Build images array from map
   const images = Array.from(imagesRef.current.values());
@@ -337,7 +394,8 @@ export function useCollage() {
     deleteAll,
     sendToFront,
     sendToBack,
-    handleMove,
-    handleResize,
+    toggleLock,
+    handleTransform,
+    takeScreenshot,
   };
 }

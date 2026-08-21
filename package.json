@@ -9,10 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "interactjs": "^1.10.27",
+    "@napi-rs/canvas": "^0.1.97",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^1.7.0",
     "next": "16.2.2",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-qr-code": "^2.0.18",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
