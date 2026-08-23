@@ -43,25 +43,13 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col items-center px-4 py-6 md:px-6">
-      {!displayMode && (
-        <div className="md:hidden mb-6">
-          <QRCode
-            value="https://collage.andrew-boylan.com"
-            size={80}
-            level="M"
-            fgColor="var(--foreground)"
-            bgColor="transparent"
-          />
-        </div>
-      )}
-
       {/* Wide layouts use one consistent 24px rhythm from page to sidebar to canvas. */}
       <div className={displayMode
         ? "w-full grid grid-cols-1 gap-6 items-start"
         : "w-full grid grid-cols-1 md:grid-cols-[200px_minmax(0,900px)] gap-6 items-start"
       }>
         {!displayMode && (
-          <aside className="hidden md:block">
+          <aside className="hidden md:block md:sticky md:top-6 md:self-start">
             <Toolbar
               {...toolbarProps}
               desktopHeader={(
@@ -71,7 +59,7 @@ export default function Home() {
                 >
                   <QRCode
                     value="https://collage.andrew-boylan.com"
-                    size={56}
+                    size={96}
                     level="M"
                     fgColor="var(--foreground)"
                     bgColor="transparent"
