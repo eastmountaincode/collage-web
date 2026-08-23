@@ -92,7 +92,7 @@ export default function Home() {
 
       {/* Mobile floating toolbar */}
       {!displayMode && (
-        <div data-mobile-toolbar className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-[var(--surface)] border-t border-[var(--border)] p-2" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
+        <div data-mobile-toolbar className="md:hidden fixed bottom-0 left-4 right-4 z-[100] bg-[var(--surface)] border border-b-0 border-[var(--border)] rounded-t p-2" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
           <Toolbar {...toolbarProps} mobile />
         </div>
       )}

@@ -77,7 +77,7 @@ export function Toolbar({
         {hiddenInput}
 
         {/* Row 1: Upload + Delete + Lock */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 min-[360px]:gap-2">
           <button onClick={handleFileSelect} disabled={uploading} className={`${btn} flex-1`}>
             <ImagePlus size={ICON} />
             {uploading ? "..." : "Add"}
@@ -93,7 +93,7 @@ export function Toolbar({
         </div>
 
         {/* Row 2: Layer + Screenshot + Users */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 min-[360px]:gap-2">
           <button onClick={onToFront} disabled={!selectedId} className={`${btn} flex-1`}>
             <ArrowUpToLine size={ICON} />
             Front
@@ -106,9 +106,9 @@ export function Toolbar({
             <Camera size={ICON} />
             Save
           </button>
-          <span className="flex items-center gap-1 text-xs px-1 text-[var(--accent)] whitespace-nowrap">
+          <span className="flex items-center gap-1 text-xs px-0.5 min-[360px]:px-1 text-[var(--accent)] whitespace-nowrap">
             <Users size={12} />
-            {userCount} online
+            {userCount}<span className="hidden min-[360px]:inline"> online</span>
           </span>
         </div>
       </div>
