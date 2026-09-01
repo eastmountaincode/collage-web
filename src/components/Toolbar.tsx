@@ -117,7 +117,7 @@ export function Toolbar({
 
   // Desktop — vertical side panel
   return (
-    <div data-toolbar className="bg-[var(--surface)] border border-[var(--border)] rounded p-4 w-[200px] max-h-[calc(100vh-3rem)] overflow-y-auto [scrollbar-gutter:stable] shrink-0 shadow-sm">
+    <div data-toolbar className="bg-[var(--surface)] border border-[var(--border)] rounded p-4 w-[200px] max-h-[calc(100vh-3rem)] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0 shadow-sm">
       {hiddenInput}
 
       {desktopHeader && (
