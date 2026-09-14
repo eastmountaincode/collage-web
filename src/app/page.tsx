@@ -59,7 +59,7 @@ export default function Home() {
                 >
                   <QRCode
                     value="https://collage.andrew-boylan.com"
-                    size={96}
+                    size={166}
                     level="M"
                     fgColor="var(--foreground)"
                     bgColor="transparent"
