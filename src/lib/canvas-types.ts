@@ -1,5 +1,5 @@
 export const CANVAS_W = 900;
-export const CANVAS_H = 1200;
+export const CANVAS_H = 1300;
 export const MIN_SIZE = 25;
 export const EDGE_ZONE = 14;
 export const CORNER_ZONE = 20;

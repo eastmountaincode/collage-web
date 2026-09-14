@@ -41,7 +41,7 @@ body {
 /* Canvas — must be global because gesture handlers manipulate these elements directly */
 #canvas {
   width: 900px;
-  height: 1200px;
+  height: 1300px;
   border: 2px solid var(--border);
   position: relative;
   background-color: var(--canvas-bg);
