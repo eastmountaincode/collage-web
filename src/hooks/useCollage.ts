@@ -219,7 +219,7 @@ export function useCollage() {
   }, []);
 
   const uploadImage = useCallback(
-    async (file: File) => {
+    async (file: File, dropPoint?: { x: number; y: number }) => {
       const id = crypto.randomUUID();
       const ext = file.name.split(".").pop() || "png";
       const renamedFile = new File([file], `${id}.${ext}`, { type: file.type });
@@ -260,9 +260,14 @@ export function useCollage() {
         width = Math.round((INITIAL_SIZE / naturalHeight) * naturalWidth);
       }
 
-      // Center on canvas
-      const x = Math.round((CANVAS_W - width) / 2);
-      const y = Math.round((CANVAS_H - height) / 2);
+      // Toolbar uploads are centered. Desktop drops are centered on the cursor
+      // and clamped so the full image remains on the canvas.
+      const x = dropPoint
+        ? Math.max(0, Math.min(CANVAS_W - width, Math.round(dropPoint.x - width / 2)))
+        : Math.round((CANVAS_W - width) / 2);
+      const y = dropPoint
+        ? Math.max(0, Math.min(CANVAS_H - height, Math.round(dropPoint.y - height / 2)))
+        : Math.round((CANVAS_H - height) / 2);
 
       // Calculate zIndex
       const existingImages = Array.from(imagesRef.current.values());

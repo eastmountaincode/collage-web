@@ -134,3 +134,16 @@ body {
   outline: 2px solid rgba(0, 0, 0, 0.65);
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.12);
 }
+
+.canvas-drop-indicator {
+  position: absolute;
+  inset: 16px;
+  z-index: 2147483647;
+  display: grid;
+  place-items: center;
+  border: 3px dashed var(--foreground);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--foreground);
+  font-size: 24px;
+  pointer-events: none;
+}

@@ -76,6 +76,7 @@ export default function Home() {
           selectedId={displayMode ? null : collage.selectedId}
           selectImage={displayMode ? () => {} : collage.selectImage}
           handleTransform={displayMode ? () => {} : collage.handleTransform}
+          onDropImage={displayMode ? undefined : collage.uploadImage}
           alignDesktop={displayMode ? "center" : "start"}
         />
       </div>

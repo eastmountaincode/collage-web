@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, type DragEvent } from "react";
 import type { CollageImage } from "@/lib/types";
 import { CANVAS_W, CANVAS_H } from "@/lib/canvas-types";
 import { useCanvasGestures } from "@/hooks/useCanvasGestures";
@@ -15,7 +15,12 @@ interface CanvasProps {
     id: string, x: number, y: number, w: number, h: number,
     rotation: number, final?: boolean
   ) => void;
+  onDropImage?: (file: File, point: { x: number; y: number }) => Promise<void>;
   alignDesktop?: "start" | "center";
+}
+
+function containsFiles(event: DragEvent<HTMLElement>) {
+  return Array.from(event.dataTransfer.types).includes("Files");
 }
 
 export function Canvas({
@@ -23,12 +28,15 @@ export function Canvas({
   selectedId,
   selectImage,
   handleTransform,
+  onDropImage,
   alignDesktop = "center",
 }: CanvasProps) {
   useCanvasGestures({ selectImage, handleTransform });
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const dragDepthRef = useRef(0);
   const [scale, setScale] = useState(1);
+  const [dropState, setDropState] = useState<"idle" | "ready" | "uploading">("idle");
 
   const updateScale = useCallback(() => {
     const container = containerRef.current;
@@ -73,6 +81,53 @@ export function Canvas({
     if (e.target === e.currentTarget) selectImage(null);
   };
 
+  const handleDragEnter = (event: DragEvent<HTMLDivElement>) => {
+    if (!onDropImage || !containsFiles(event)) return;
+    event.preventDefault();
+    dragDepthRef.current += 1;
+    setDropState("ready");
+  };
+
+  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+    if (!onDropImage || !containsFiles(event)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+  };
+
+  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
+    if (!onDropImage || !containsFiles(event)) return;
+    event.preventDefault();
+    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+    if (dragDepthRef.current === 0) setDropState("idle");
+  };
+
+  const handleDrop = async (event: DragEvent<HTMLDivElement>) => {
+    if (!onDropImage || !containsFiles(event)) return;
+    event.preventDefault();
+    dragDepthRef.current = 0;
+
+    const file = Array.from(event.dataTransfer.files).find((item) => item.type.startsWith("image/"));
+    if (!file) {
+      setDropState("idle");
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const point = {
+      x: ((event.clientX - rect.left) / rect.width) * CANVAS_W,
+      y: ((event.clientY - rect.top) / rect.height) * CANVAS_H,
+    };
+
+    setDropState("uploading");
+    try {
+      await onDropImage(file, point);
+    } catch {
+      // The toolbar upload follows the same silent failure behavior.
+    } finally {
+      setDropState("idle");
+    }
+  };
+
   return (
     <div
       ref={containerRef}
@@ -91,11 +146,20 @@ export function Canvas({
         <div
           id="canvas"
           onClick={handleCanvasClick}
+          onDragEnter={handleDragEnter}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
           style={{
             transform: `scale(${scale})`,
             transformOrigin: "top left",
           }}
         >
+          {dropState !== "idle" && (
+            <div className="canvas-drop-indicator" aria-hidden="true">
+              {dropState === "uploading" ? "Uploading..." : "Drop image here"}
+            </div>
+          )}
           {images.map((img) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
