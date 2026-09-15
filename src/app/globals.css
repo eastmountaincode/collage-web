@@ -5,7 +5,6 @@
   --background: #ffffff;
   --foreground: #000000;
   --surface: #ffffff;
-  --panel: #f3f3f3;
   --border: #b8b8b8;
   --accent: #555555;
   --canvas-bg: #ffffff;
@@ -33,7 +32,7 @@ body {
 }
 
 .tool-panel {
-  background: var(--panel);
+  background: var(--surface);
   border: 1px solid var(--border);
 }
 
@@ -60,25 +59,16 @@ body {
 
 .native-button {
   appearance: auto;
-  -webkit-appearance: button;
+  -webkit-appearance: auto;
   min-width: 0;
-  min-height: 34px;
-  padding: 8px 12px;
+  min-height: revert;
+  padding: revert;
   border: revert;
   border-radius: revert;
   background: revert;
   color: revert;
-  font: inherit;
-  font-size: 13px;
-  line-height: 1.2;
-}
-
-.native-button:not(:disabled) {
-  cursor: pointer;
-}
-
-.native-button:disabled {
-  cursor: not-allowed;
+  font: revert;
+  line-height: normal;
 }
 
 .native-details summary {
