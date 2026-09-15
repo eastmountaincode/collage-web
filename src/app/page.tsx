@@ -93,7 +93,7 @@ export default function Home() {
 
       {/* Mobile floating toolbar */}
       {!displayMode && (
-        <div data-mobile-toolbar className="tool-panel md:hidden fixed bottom-0 left-4 right-4 z-[100] border-b-0 p-2" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
+        <div data-mobile-toolbar className="md:hidden fixed bottom-0 left-4 right-4 z-[100]">
           <Toolbar {...toolbarProps} mobile />
         </div>
       )}

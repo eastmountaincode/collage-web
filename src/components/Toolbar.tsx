@@ -71,35 +71,35 @@ export function Toolbar({
 
   if (mobile) {
     return (
-      <div data-toolbar className="flex flex-col gap-2.5 py-1">
+      <div data-toolbar>
         {hiddenInput}
         <fieldset className="tool-fieldset mobile-tool-fieldset">
-          <legend>Collage controls</legend>
+          <legend>Controls</legend>
           <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-1 min-[360px]:gap-2">
-              <button type="button" onClick={handleFileSelect} disabled={uploading} className={`${btn} flex-1`}>
+            <div className="grid grid-cols-3 items-center gap-1 min-[360px]:gap-2">
+              <button type="button" onClick={handleFileSelect} disabled={uploading} className={`${btn} mobile-control-button flex-1`}>
                 <ImagePlus size={ICON} />
                 {uploading ? "..." : "Add"}
               </button>
-              <button type="button" onClick={onDelete} disabled={!selectedId} className={`${btnDanger} flex-1`}>
+              <button type="button" onClick={onDelete} disabled={!selectedId} className={`${btnDanger} mobile-control-button flex-1`}>
                 <Trash2 size={ICON} />
                 Delete
               </button>
-              <button type="button" onClick={onToggleLock} disabled={!selectedId} className={`${btn} flex-1`}>
+              <button type="button" onClick={onToggleLock} disabled={!selectedId} className={`${btn} mobile-control-button flex-1`}>
                 {selectedLocked ? <Lock size={ICON} /> : <Unlock size={ICON} />}
                 {selectedLocked ? "Unlock" : "Lock"}
               </button>
             </div>
-            <div className="flex items-center gap-1 min-[360px]:gap-2">
-              <button type="button" onClick={onToFront} disabled={!selectedId} className={`${btn} flex-1`}>
+            <div className="grid grid-cols-[repeat(3,minmax(0,1fr))_auto] items-center gap-1 min-[360px]:gap-2">
+              <button type="button" onClick={onToFront} disabled={!selectedId} className={`${btn} mobile-control-button flex-1`}>
                 <ArrowUpToLine size={ICON} />
                 Front
               </button>
-              <button type="button" onClick={onToBack} disabled={!selectedId} className={`${btn} flex-1`}>
+              <button type="button" onClick={onToBack} disabled={!selectedId} className={`${btn} mobile-control-button flex-1`}>
                 <ArrowDownToLine size={ICON} />
                 Back
               </button>
-              <button type="button" onClick={onScreenshot} className={`${btn} flex-1`}>
+              <button type="button" onClick={onScreenshot} className={`${btn} mobile-control-button flex-1`}>
                 <Camera size={ICON} />
                 Save
               </button>
@@ -125,14 +125,14 @@ export function Toolbar({
         </div>
       )}
 
-      <ToolGroup label="Add image">
+      <ToolGroup label="Add Image">
         <button type="button" onClick={handleFileSelect} disabled={uploading} className={btnFull}>
           <ImagePlus size={ICON} />
           {uploading ? "Uploading..." : "Choose File"}
         </button>
       </ToolGroup>
 
-      <ToolGroup label="Selected image">
+      <ToolGroup label="Controls">
         <div className="flex flex-col gap-1.5">
           <button type="button" onClick={onDelete} disabled={!selectedId} className={btnDangerFull}>
             <Trash2 size={ICON} />
@@ -168,7 +168,7 @@ export function Toolbar({
         </div>
       </ToolGroup>
 
-      <ToolGroup label="Collage">
+      <ToolGroup label="Settings">
         {!confirmDeleteAll ? (
           <button type="button" onClick={() => setConfirmDeleteAll(true)} className={btnDangerFull}>
             <Eraser size={ICON} />

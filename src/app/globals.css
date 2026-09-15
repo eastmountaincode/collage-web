@@ -52,23 +52,40 @@ body {
 }
 
 .mobile-tool-fieldset {
-  margin-top: 0;
-  margin-bottom: 0;
-  padding-bottom: 6px;
+  width: 100%;
+  margin: 0;
+  padding: 6px 7px max(8px, env(safe-area-inset-bottom));
+  border: 1px solid var(--border);
+  background: var(--surface);
 }
 
 .native-button {
   appearance: auto;
-  -webkit-appearance: auto;
+  -webkit-appearance: button;
   min-width: 0;
-  min-height: revert;
-  padding: revert;
+  min-height: 34px;
+  padding: 8px 12px;
   border: revert;
   border-radius: revert;
   background: revert;
   color: revert;
-  font: revert;
-  line-height: normal;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.native-button:not(:disabled) {
+  cursor: pointer;
+}
+
+.native-button:disabled {
+  cursor: not-allowed;
+}
+
+.mobile-control-button {
+  width: 100%;
+  padding-right: 4px;
+  padding-left: 4px;
 }
 
 .native-details summary {
