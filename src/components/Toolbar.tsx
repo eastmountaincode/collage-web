@@ -3,7 +3,7 @@
 import { useRef, useState, type ReactNode } from "react";
 import {
   ImagePlus, Trash2, ArrowUpToLine, ArrowDownToLine,
-  Lock, Unlock, Camera, Monitor, Eraser, Users, Info,
+  Lock, Unlock, Camera, Monitor, Eraser, Users,
 } from "lucide-react";
 
 interface ToolbarProps {
@@ -22,13 +22,12 @@ interface ToolbarProps {
   desktopHeader?: ReactNode;
 }
 
-const btn = "flex items-center justify-center gap-1.5 px-3 py-2 text-[13px] border border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] rounded cursor-pointer whitespace-nowrap text-center transition-colors hover:bg-[var(--hover)] hover:border-[var(--hover-border)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-[var(--surface)] disabled:hover:border-[var(--border)]";
+const btn = "native-button inline-flex items-center justify-center gap-1.5 whitespace-nowrap text-center";
 const btnFull = `${btn} w-full`;
-const btnDanger = `${btn} hover:bg-[var(--danger-hover)] hover:border-[var(--danger-border)]`;
+const btnDanger = btn;
 const btnDangerFull = `${btnDanger} w-full`;
-const btnYes = `${btn} bg-[var(--danger-bg)] border-[var(--danger-border)] text-[var(--danger-text)]`;
+const btnYes = btn;
 const btnNo = `${btn}`;
-const labelCls = "text-[11px] tracking-[0.1em] text-[var(--accent)] mb-2";
 const ICON = 14;
 
 export function Toolbar({
@@ -49,7 +48,6 @@ export function Toolbar({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
 
   const handleFileSelect = () => fileInputRef.current?.click();
 
@@ -75,49 +73,50 @@ export function Toolbar({
     return (
       <div data-toolbar className="flex flex-col gap-2.5 py-1">
         {hiddenInput}
-
-        {/* Row 1: Upload + Delete + Lock */}
-        <div className="flex items-center gap-1 min-[360px]:gap-2">
-          <button onClick={handleFileSelect} disabled={uploading} className={`${btn} flex-1`}>
-            <ImagePlus size={ICON} />
-            {uploading ? "..." : "Add"}
-          </button>
-          <button onClick={onDelete} disabled={!selectedId} className={`${btnDanger} flex-1`}>
-            <Trash2 size={ICON} />
-            Delete
-          </button>
-          <button onClick={onToggleLock} disabled={!selectedId} className={`${btn} flex-1`}>
-            {selectedLocked ? <Lock size={ICON} /> : <Unlock size={ICON} />}
-            {selectedLocked ? "Unlock" : "Lock"}
-          </button>
-        </div>
-
-        {/* Row 2: Layer + Screenshot + Users */}
-        <div className="flex items-center gap-1 min-[360px]:gap-2">
-          <button onClick={onToFront} disabled={!selectedId} className={`${btn} flex-1`}>
-            <ArrowUpToLine size={ICON} />
-            Front
-          </button>
-          <button onClick={onToBack} disabled={!selectedId} className={`${btn} flex-1`}>
-            <ArrowDownToLine size={ICON} />
-            Back
-          </button>
-          <button onClick={onScreenshot} className={`${btn} flex-1`}>
-            <Camera size={ICON} />
-            Save
-          </button>
-          <span className="flex items-center gap-1 text-xs px-0.5 min-[360px]:px-1 text-[var(--accent)] whitespace-nowrap">
-            <Users size={12} />
-            {userCount}<span className="hidden min-[360px]:inline"> online</span>
-          </span>
-        </div>
+        <fieldset className="tool-fieldset mobile-tool-fieldset">
+          <legend>Collage controls</legend>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-1 min-[360px]:gap-2">
+              <button type="button" onClick={handleFileSelect} disabled={uploading} className={`${btn} flex-1`}>
+                <ImagePlus size={ICON} />
+                {uploading ? "..." : "Add"}
+              </button>
+              <button type="button" onClick={onDelete} disabled={!selectedId} className={`${btnDanger} flex-1`}>
+                <Trash2 size={ICON} />
+                Delete
+              </button>
+              <button type="button" onClick={onToggleLock} disabled={!selectedId} className={`${btn} flex-1`}>
+                {selectedLocked ? <Lock size={ICON} /> : <Unlock size={ICON} />}
+                {selectedLocked ? "Unlock" : "Lock"}
+              </button>
+            </div>
+            <div className="flex items-center gap-1 min-[360px]:gap-2">
+              <button type="button" onClick={onToFront} disabled={!selectedId} className={`${btn} flex-1`}>
+                <ArrowUpToLine size={ICON} />
+                Front
+              </button>
+              <button type="button" onClick={onToBack} disabled={!selectedId} className={`${btn} flex-1`}>
+                <ArrowDownToLine size={ICON} />
+                Back
+              </button>
+              <button type="button" onClick={onScreenshot} className={`${btn} flex-1`}>
+                <Camera size={ICON} />
+                Save
+              </button>
+              <output className="flex items-center gap-1 px-0.5 min-[360px]:px-1 text-[var(--accent)] whitespace-nowrap" aria-live="polite">
+                <Users size={12} />
+                {userCount}<span className="hidden min-[360px]:inline"> online</span>
+              </output>
+            </div>
+          </div>
+        </fieldset>
       </div>
     );
   }
 
   // Desktop — vertical side panel
   return (
-    <div data-toolbar className="bg-[var(--surface)] border border-[var(--border)] rounded p-4 w-[200px] max-h-[calc(100vh-3rem)] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0 shadow-sm">
+    <div data-toolbar className="tool-panel p-4 w-[200px] max-h-[calc(100vh-3rem)] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0">
       {hiddenInput}
 
       {desktopHeader && (
@@ -126,56 +125,52 @@ export function Toolbar({
         </div>
       )}
 
-      <Section>
-        <div className={labelCls}>Add Image</div>
-        <button onClick={handleFileSelect} disabled={uploading} className={btnFull}>
+      <ToolGroup label="Add image">
+        <button type="button" onClick={handleFileSelect} disabled={uploading} className={btnFull}>
           <ImagePlus size={ICON} />
           {uploading ? "Uploading..." : "Choose File"}
         </button>
-      </Section>
+      </ToolGroup>
 
-      <Section divided>
-        <div className={labelCls}>Selected Image</div>
-        <div className="flex flex-col gap-2">
-          <button onClick={onDelete} disabled={!selectedId} className={btnDangerFull}>
+      <ToolGroup label="Selected image">
+        <div className="flex flex-col gap-1.5">
+          <button type="button" onClick={onDelete} disabled={!selectedId} className={btnDangerFull}>
             <Trash2 size={ICON} />
             Delete
           </button>
-          <button onClick={onToFront} disabled={!selectedId} className={btnFull}>
+          <button type="button" onClick={onToFront} disabled={!selectedId} className={btnFull}>
             <ArrowUpToLine size={ICON} />
             Send to Front
           </button>
-          <button onClick={onToBack} disabled={!selectedId} className={btnFull}>
+          <button type="button" onClick={onToBack} disabled={!selectedId} className={btnFull}>
             <ArrowDownToLine size={ICON} />
             Send to Back
           </button>
-          <button onClick={onToggleLock} disabled={!selectedId} className={btnFull}>
+          <button type="button" onClick={onToggleLock} disabled={!selectedId} className={btnFull}>
             {selectedLocked ? <Lock size={ICON} /> : <Unlock size={ICON} />}
             {selectedLocked ? "Locked" : "Lock"}
           </button>
         </div>
-      </Section>
+      </ToolGroup>
 
-      <Section>
-        <div className={labelCls}>View</div>
-        <div className="flex flex-col gap-2">
-          <button onClick={onScreenshot} className={btnFull}>
+      <ToolGroup label="View">
+        <div className="flex flex-col gap-1.5">
+          <button type="button" onClick={onScreenshot} className={btnFull}>
             <Camera size={ICON} />
             Screenshot
           </button>
           {onDisplayMode && (
-            <button onClick={onDisplayMode} className={btnFull}>
+            <button type="button" onClick={onDisplayMode} className={btnFull}>
               <Monitor size={ICON} />
               Display Mode
             </button>
           )}
         </div>
-      </Section>
+      </ToolGroup>
 
-      <Section>
-        <div className={labelCls}>Danger Zone</div>
+      <ToolGroup label="Collage">
         {!confirmDeleteAll ? (
-          <button onClick={() => setConfirmDeleteAll(true)} className={btnDangerFull}>
+          <button type="button" onClick={() => setConfirmDeleteAll(true)} className={btnDangerFull}>
             <Eraser size={ICON} />
             Clear All
           </button>
@@ -183,32 +178,23 @@ export function Toolbar({
           <div className="flex flex-col gap-2">
             <span className="text-xs text-[var(--accent)]">Delete all images?</span>
             <div className="flex gap-2">
-              <button onClick={() => { onDeleteAll(); setConfirmDeleteAll(false); }} className={`${btnYes} flex-1`}>Yes</button>
-              <button onClick={() => setConfirmDeleteAll(false)} className={`${btnNo} flex-1`}>No</button>
+              <button type="button" onClick={() => { onDeleteAll(); setConfirmDeleteAll(false); }} className={`${btnYes} flex-1`}>Yes</button>
+              <button type="button" onClick={() => setConfirmDeleteAll(false)} className={`${btnNo} flex-1`}>No</button>
             </div>
           </div>
         )}
-      </Section>
+      </ToolGroup>
 
-      <Section divided>
-        <div className={labelCls}>Status</div>
-        <span className="flex items-center gap-1.5 text-sm text-[var(--accent)]">
+      <ToolGroup label="Status">
+        <output className="flex items-center gap-1.5 text-[var(--accent)]" aria-live="polite">
           <Users size={14} />
           {userCount} {userCount === 1 ? "user" : "users"} online
-        </span>
-      </Section>
+        </output>
+      </ToolGroup>
 
-      <div>
-        <button
-          onClick={() => setShowAbout(!showAbout)}
-          aria-expanded={showAbout}
-          className="flex items-center gap-1 text-xs cursor-pointer text-[var(--accent)] bg-transparent border-none p-0"
-        >
-          <Info size={12} />
-          About / How To {showAbout ? "\u25B2" : "\u25BC"}
-        </button>
-        {showAbout && (
-          <div className="text-xs mt-3 leading-relaxed text-[var(--accent)]">
+      <details className="native-details px-1">
+        <summary>About / How To</summary>
+          <div className="mt-2 leading-relaxed text-[var(--accent)]">
             <p className="mb-2">
               <strong className="text-[var(--foreground)]">Body Language</strong>{' '}is a collaborative collage.
               Add, move, and resize images. You&apos;ll see other users&apos; interactions in real time.
@@ -243,8 +229,7 @@ export function Toolbar({
               </div>
             </div>
           </div>
-        )}
-      </div>
+      </details>
     </div>
   );
 }
@@ -257,7 +242,7 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
       rel="noopener noreferrer"
       aria-label={label}
       title={label}
-      className="inline-flex items-center justify-center size-8 rounded border border-[var(--border)] text-[var(--accent)] transition-colors hover:text-[var(--foreground)] hover:bg-[var(--hover)] hover:border-[var(--hover-border)]"
+      className="native-icon-link inline-flex items-center justify-center size-7"
     >
       {children}
     </a>
@@ -288,10 +273,11 @@ function GitHubIcon() {
   );
 }
 
-function Section({ children, divided = false }: { children: React.ReactNode; divided?: boolean }) {
+function ToolGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className={`pb-2 mb-2 ${divided ? "border-b border-[var(--border)]" : ""}`}>
+    <fieldset className="tool-fieldset">
+      <legend>{label}</legend>
       {children}
-    </div>
+    </fieldset>
   );
 }

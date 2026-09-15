@@ -83,8 +83,9 @@ export default function Home() {
       {/* Display mode exit button */}
       {displayMode && (
         <button
+          type="button"
           onClick={() => setDisplayMode(false)}
-          className="fixed top-4 right-4 text-xs px-3 py-1.5 rounded bg-[var(--surface)] text-[var(--accent)] hover:text-[var(--foreground)] hover:bg-[var(--hover)] transition-colors border border-[var(--border)] cursor-pointer z-50"
+          className="native-button fixed top-4 right-4 z-50"
         >
           Exit Display
         </button>
@@ -92,7 +93,7 @@ export default function Home() {
 
       {/* Mobile floating toolbar */}
       {!displayMode && (
-        <div data-mobile-toolbar className="md:hidden fixed bottom-0 left-4 right-4 z-[100] bg-[var(--surface)] border border-b-0 border-[var(--border)] rounded-t p-2" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
+        <div data-mobile-toolbar className="tool-panel md:hidden fixed bottom-0 left-4 right-4 z-[100] border-b-0 p-2" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom))" }}>
           <Toolbar {...toolbarProps} mobile />
         </div>
       )}

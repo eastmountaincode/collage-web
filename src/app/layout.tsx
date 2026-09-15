@@ -1,12 +1,5 @@
 import type { Metadata } from "next";
-import { DotGothic16 } from "next/font/google";
 import "./globals.css";
-
-const dotGothic16 = DotGothic16({
-  variable: "--font-dot-gothic-16",
-  subsets: ["latin"],
-  weight: "400",
-});
 
 export const metadata: Metadata = {
   title: "Body Language — Collaborative Collage",
@@ -34,10 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${dotGothic16.variable} h-full antialiased`}
-    >
+    <html lang="en" className="h-full">
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
